@@ -9,6 +9,7 @@ module cla64_flat(
     output        cout
 );
 
+
     wire [63:0] p, g;
     wire [64:0] c;
 

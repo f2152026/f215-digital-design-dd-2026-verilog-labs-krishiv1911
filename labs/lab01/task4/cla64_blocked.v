@@ -28,6 +28,7 @@ module cla64_blocked(
         .cout(c[1])
     );
 
+
     cla4 block1 (
         .a(a[7:4]),
         .b(b[7:4]),

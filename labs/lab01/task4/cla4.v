@@ -81,6 +81,7 @@ module cla4(
         p2_p1_g0,
         p2_p1_p0_cin
     );
+    
 
     and #(2) t_c4_1(p3_g2, p3, g2);
     and #(2) t_c4_2(p3_p2_g1, p3, p2, g1);

@@ -51,9 +51,10 @@ module ripple_adder(
         .cin(c3),
         .sum(sum[3]),
         .cout(cout)
-    );
+    ); 
 
 
   // TODO: your four FA_Gate instances go here.
 
 endmodule
+ 
