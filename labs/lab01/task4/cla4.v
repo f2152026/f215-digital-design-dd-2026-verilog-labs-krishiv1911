@@ -1,6 +1,4 @@
 // cla4.v
-// (Carried forward from Task 3 -- paste in your completed, delay-annotated
-// version.)
 // Gate-level 4-bit carry-lookahead adder, matching the lecture circuit.
 // Every gate needs an explicit delay (constant is fine here, e.g. #(2)) --
 // this is the default from Task 2 onward, not a special step.
@@ -32,6 +30,83 @@ module cla4(
   wire p0, p1, p2, p3;
   wire g0, g1, g2, g3;
   wire c1, c2, c3;
+  wire p0_cin;
+  wire p1_g0;
+  wire p1_p0_cin;
+  wire p2_g1;
+  wire p2_p1_g0;
+  wire p2_p1_p0_cin;
+  wire p3_g2;
+  wire p3_p2_g1;
+  wire p3_p2_p1_g0;
+  wire p3_p2_p1_p0_cin;
+
+    // -------------------------------------------------
+    // Step 1: Propagate and Generate
+    // -------------------------------------------------
+
+    xor #(2) p0_gate(p0, a[0], b[0]);
+    xor #(2) p1_gate(p1, a[1], b[1]);
+    xor #(2) p2_gate(p2, a[2], b[2]);
+    xor #(2) p3_gate(p3, a[3], b[3]);
+
+    and #(2) g0_gate(g0, a[0], b[0]);
+    and #(2) g1_gate(g1, a[1], b[1]);
+    and #(2) g2_gate(g2, a[2], b[2]);
+    and #(2) g3_gate(g3, a[3], b[3]);
+
+    // -------------------------------------------------
+    // Step 2: Carry equations
+    // c1 = g0 + p0.cin
+    // c2 = g1 + p1.g0 + p1.p0.cin
+    // c3 = g2 + p2.g1 + p2.p1.g0 + p2.p1.p0.cin
+    // c4 = g3 + p3.g2 + p3.p2.g1
+    //      + p3.p2.p1.g0 + p3.p2.p1.p0.cin
+    // -------------------------------------------------
+
+    and #(2) t_c1(p0_cin, p0, cin);
+    or  #(2) c1_gate(c1, g0, p0_cin);
+
+    and #(2) t_c2_1(p1_g0, p1, g0);
+    and #(2) t_c2_2(p1_p0_cin, p1, p0, cin);
+    or  #(2) c2_gate(c2, g1, p1_g0, p1_p0_cin);
+
+    and #(2) t_c3_1(p2_g1, p2, g1);
+    and #(2) t_c3_2(p2_p1_g0, p2, p1, g0);
+    and #(2) t_c3_3(p2_p1_p0_cin, p2, p1, p0, cin);
+    or  #(2) c3_gate(
+        c3,
+        g2,
+        p2_g1,
+        p2_p1_g0,
+        p2_p1_p0_cin
+    );
+    
+
+    and #(2) t_c4_1(p3_g2, p3, g2);
+    and #(2) t_c4_2(p3_p2_g1, p3, p2, g1);
+    and #(2) t_c4_3(p3_p2_p1_g0, p3, p2, p1, g0);
+    and #(2) t_c4_4(p3_p2_p1_p0_cin, p3, p2, p1, p0, cin);
+
+    or #(2) c4_gate(
+        cout,
+        g3,
+        p3_g2,
+        p3_p2_g1,
+        p3_p2_p1_g0,
+        p3_p2_p1_p0_cin
+    );
+
+    // -------------------------------------------------
+    // Step 3: Sum bits
+    // sum[i] = p[i] ^ c[i]
+    // c0 = cin
+    // -------------------------------------------------
+
+    xor #(2) sum0_gate(sum[0], p0, cin);
+    xor #(2) sum1_gate(sum[1], p1, c1);
+    xor #(2) sum2_gate(sum[2], p2, c2);
+    xor #(2) sum3_gate(sum[3], p3, c3);
 
   // TODO: your gate-level P/G, carry, and sum logic goes here.
   // (cout should be connected to c4.) Remember the delay on every gate.
